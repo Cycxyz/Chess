@@ -36,6 +36,7 @@ public:
 
 void InitFigures(Figures figures)
 {
+    figures.resize(32);
     for (int j = 0; j < 2; j++)
     {
     for (int i = 0; i < 8; i++)
@@ -122,6 +123,13 @@ void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures fig
 {
     int x = event.mouseButton.x / 100;
     int y = event.mouseButton.y / 100;
+    if ((x < 0 || y < 0 || x>7 || y>7))
+    {
+        Cell.sprite.setPosition(-100, -100);
+        Capturedfigure->SetPosition(Capturedfigure->x, Capturedfigure->y);
+        Capturedfigure = NULL;
+    }
+    else
     if (!(x == Capturedfigure->x && y == Capturedfigure->y)) //если фигура выделена и нажато на другом поле
     {
         int index = FindFigure(x, y, figures);
@@ -157,7 +165,7 @@ int main()
     CapturedFigureCell Cell;
     vector< shared_ptr<Figure>>figures;
     BoardConfigurator boardcfg;
-   // InitFigures(figures);
+    InitFigures(figures);
     InitExtraFigures(extraFigures);
     sf::RenderWindow window(sf::VideoMode(1000, 800), "May be chess");
     shared_ptr<Figure> Capturedfigure;
@@ -228,9 +236,18 @@ int main()
                 { 
                     if(Capturedfigure!=NULL)
                     { 
-                      //Переместить и зачистить если отпущена кнопка на поле отличном от начального
                             int x = event.mouseButton.x / 100;
                             int y = event.mouseButton.y / 100;
+                            if ((x < 0 || y < 0 || x>7 || y>7) && isFigureCaptured)
+                            {
+                                    wasFigureGiven = 0;
+                                    isFigureCaptured = 0;
+                                    Cell.sprite.setPosition(-100, -100);
+                                    Capturedfigure->SetPosition(Capturedfigure->x, Capturedfigure->y);
+                                    Capturedfigure = NULL; 
+                            }
+                            else
+                      //Переместить и зачистить если отпущена кнопка на поле отличном от начального
                             if (!(x == Capturedfigure->x && y == Capturedfigure->y))
                             {
                                 wasFigureGiven = 0;
