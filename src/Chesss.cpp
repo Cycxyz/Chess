@@ -11,9 +11,6 @@
 #include"CapturedFigure.h"
 #include<memory>
 using namespace std;
-#define Figures  vector<shared_ptr<Figure>>&
-
-
 
 class BoardConfigurator
 {
@@ -93,8 +90,24 @@ void InitExtraFigures(Figures figures)
         figures[5+i*6]->SetPosition(8+i, 5);
     }
 }
-
-void Draw(sf::RenderWindow& window, BoardConfigurator board, Figures figures, CapturedFigureCell Cell, Figures extraFigures)
+class Move
+{
+public:
+    sf::Image image;
+    sf::Texture texture;
+    sf::Sprite sprite;
+    Move(Cells cell)
+    {
+        image.loadFromFile("../images/move.png");
+        auto pixel = image.getPixel(0, 0);
+        image.createMaskFromColor(pixel);
+        texture.loadFromImage(image);
+        texture.setSmooth(1);
+        sprite.setTexture(texture);
+        sprite.setPosition(cell.x * 100, cell.y * 100);
+    }
+};
+void Draw(sf::RenderWindow& window, BoardConfigurator board, Figures figures, CapturedFigureCell Cell, Figures extraFigures, vector<Move> move)
 {
 window.clear(sf::Color::Blue);
     window.draw(board.sprite);
@@ -103,17 +116,12 @@ window.clear(sf::Color::Blue);
         window.draw(extraFigures[i]->sprite);
     for (int i = 0; i < figures.size(); i++)
         window.draw(figures[i]->sprite);
+    for (int i = 0; i < move.size(); i++)
+        window.draw(move[i].sprite);
     window.display();
 }
 
-int FindFigure(int x, int y, Figures figures)
-{
-    for (int i = 0; i < figures.size(); i++)
-    {
-        if (figures[i]->cell.x == x && figures[i]->cell.y == y) return i;
-    }
-    return -1;
-}
+
 
 //Двигает фигуру на указанное место или поднимает, фигура выделена
 void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures figures, CapturedFigureCell& Cell)
@@ -133,6 +141,7 @@ void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures fig
         if (index != -1) figures.erase(figures.begin() + index);
         Cell.sprite.setPosition(-100, -100);
         Capturedfigure->SetPosition(x, y);
+        Capturedfigure.get()->allowed.clear();
         Capturedfigure = NULL;
     }
 }
@@ -157,12 +166,13 @@ shared_ptr<Figure> ParseFigure(shared_ptr<Figure> figure)
 
 int main()
 {
+    vector<Move> move;
     set<Cells> forbidden;
     vector< shared_ptr<Figure> >extraFigures(12);
     CapturedFigureCell Cell;
     vector< shared_ptr<Figure>>figures;
     BoardConfigurator boardcfg;
-    InitFigures(figures);
+    //InitFigures(figures);
     InitExtraFigures(extraFigures);
     sf::RenderWindow window(sf::VideoMode(1000, 800), "May be chess");
     shared_ptr<Figure> Capturedfigure;
@@ -187,7 +197,11 @@ int main()
                     if (Capturedfigure!=NULL) //если фигура уже выделена, то необходимо или сделать ход или поднять 
                     {
                         MoveFigure(event, Capturedfigure, figures, Cell);
-                        if (Capturedfigure == NULL) wasFigureGiven = 0;
+                        if (Capturedfigure == NULL)
+                        {
+                            wasFigureGiven = 0; 
+                            move.clear();
+                        }
                         else isFigureCaptured = 1;
                     }
                     else
@@ -195,12 +209,17 @@ int main()
                         int x = event.mouseButton.x / 100;
                         int y = event.mouseButton.y / 100;
                         int i = FindFigure(x, y, figures);
-                            //Если на нажатом поле есть фигура, выделить её
+                            //Если на нажатом поле есть фигура, выделить её и показать ходы
                         if(i!=-1)
                         {
                                 Capturedfigure = figures[i];
                                 swap(figures[i], figures[figures.size() - 1]);
                                 Cell.sprite.setPosition(x * 100, y * 100);
+                                Capturedfigure.get()->CalculateAllowed(figures);
+                                for (Cells cell: Capturedfigure.get()->allowed)
+                                {
+                                    move.push_back(cell);
+                                }                               
                             }
                         else
                         {
@@ -210,7 +229,7 @@ int main()
                             {
                                 figures.push_back(ParseFigure(extraFigures[i]));
                                 Capturedfigure = figures[figures.size() - 1];
-                                Capturedfigure->sprite = extraFigures[i]->sprite;
+                                Capturedfigure.get()->SetSprite(extraFigures[i].get()->isWhite);
                                 Capturedfigure->SetPosition(extraFigures[i]->cell.x, extraFigures[i]->cell.y);
                                 Cell.sprite.setPosition(Capturedfigure->cell.x*100, Capturedfigure->cell.y*100);
                             }
@@ -235,13 +254,16 @@ int main()
                     { 
                             int x = event.mouseButton.x / 100;
                             int y = event.mouseButton.y / 100;
+                            //Если отпущена кнопка вне игрового поля
                             if ((x < 0 || y < 0 || x>7 || y>7) && isFigureCaptured)
                             {
                                     wasFigureGiven = 0;
                                     isFigureCaptured = 0;
                                     Cell.sprite.setPosition(-100, -100);
                                     Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                                    Capturedfigure->allowed.clear(); 
                                     Capturedfigure = NULL; 
+                                    move.clear();
                             }
                             else
                       //Переместить и зачистить если отпущена кнопка на поле отличном от начального
@@ -253,7 +275,9 @@ int main()
                                 int index = FindFigure(x, y, figures);
                                 if (index != -1) figures.erase(figures.begin() + index);
                                 Capturedfigure->SetPosition(x, y);
+                                Capturedfigure->allowed.clear();
                                 Capturedfigure = NULL;
+                                move.clear();
                             }
                             //Если до этого фигура была выделена, зачистить. Вернуть с гулянок
                             else if (wasFigureGiven)
@@ -262,7 +286,9 @@ int main()
                                 wasFigureGiven = 0;
                                 isFigureCaptured = 0;
                                 Capturedfigure->SetPosition(x, y);
+                                Capturedfigure->allowed.clear();
                                 Capturedfigure = NULL;
+                                move.clear();
                             }
                             //Если не была, сказать, что её отпустили и указать, что уже была взята. Вернуть с гулянок
                             else
@@ -283,7 +309,7 @@ int main()
                     Capturedfigure->sprite.setPosition(event.mouseMove.x-50, event.mouseMove.y-50);
             }
         }
-        Draw(window, boardcfg, figures, Cell, extraFigures);
+        Draw(window, boardcfg, figures, Cell, extraFigures, move);
     }
     return 0;
 }

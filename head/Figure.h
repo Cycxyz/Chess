@@ -2,6 +2,10 @@
 #include<SFML/Graphics.hpp>
 #include <set>
 #include<algorithm>
+#include<memory>
+#include<vector>
+
+
 enum class FigureType
 {
 	Figure,
@@ -17,6 +21,8 @@ struct Cells
 {
 	int x, y;
 };
+bool operator==(const Cells& c1, const Cells& c2);
+bool operator<(Cells c1, Cells c2);
 class Figure
 {
 public:
@@ -28,20 +34,16 @@ public:
 	}
 	std::set<Cells> allowed;
 	Cells cell;
+	bool isWhite;
 	sf::Image image;
 	sf::Texture texture;
 	sf::Sprite sprite;
 	FigureType type;
-	//virtual void CalculateAllowed(std::set<Cells> forbidden) = 0;
+	virtual void CalculateAllowed(std::vector<std::shared_ptr<Figure>>& figures);
 	 virtual void SetSprite(bool isWhite) = 0;
 	  void SetPosition(int x_, int y_);
 private:
-	/*void SeparateForbidden(std::set<Cells> forbidden)
-	{
-		for(Cells cell:forbidden)
-		{
-			if (allowed.count(cell))
-				allowed.erase(cell);
-		}
-	}*/
+	void SeparateForbidden();
 };
+#define Figures  std::vector<std::shared_ptr<Figure>>&
+int FindFigure(int x, int y, Figures figures);
