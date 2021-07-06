@@ -4,7 +4,7 @@
 class Queen:public Figure
 {
 public:
+	//void CalculateAllowed(std::set<Cells> forbidden) override;
 	 void  SetSprite(bool isWhite) override;
-     void  SetPosition(int x_, int y_) override;
 	 Queen():Figure(FigureType::Queen){}
 };

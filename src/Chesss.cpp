@@ -13,10 +13,7 @@
 using namespace std;
 #define Figures  vector<shared_ptr<Figure>>&
 
-struct Cells
-{
-    int x, y;
-};
+
 
 class BoardConfigurator
 {
@@ -113,7 +110,7 @@ int FindFigure(int x, int y, Figures figures)
 {
     for (int i = 0; i < figures.size(); i++)
     {
-        if (figures[i]->x == x && figures[i]->y == y) return i;
+        if (figures[i]->cell.x == x && figures[i]->cell.y == y) return i;
     }
     return -1;
 }
@@ -126,11 +123,11 @@ void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures fig
     if ((x < 0 || y < 0 || x>7 || y>7))
     {
         Cell.sprite.setPosition(-100, -100);
-        Capturedfigure->SetPosition(Capturedfigure->x, Capturedfigure->y);
+        Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
         Capturedfigure = NULL;
     }
     else
-    if (!(x == Capturedfigure->x && y == Capturedfigure->y)) //если фигура выделена и нажато на другом поле
+    if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y)) //если фигура выделена и нажато на другом поле
     {
         int index = FindFigure(x, y, figures);
         if (index != -1) figures.erase(figures.begin() + index);
@@ -214,8 +211,8 @@ int main()
                                 figures.push_back(ParseFigure(extraFigures[i]));
                                 Capturedfigure = figures[figures.size() - 1];
                                 Capturedfigure->sprite = extraFigures[i]->sprite;
-                                Capturedfigure->SetPosition(extraFigures[i]->x, extraFigures[i]->y);
-                                Cell.sprite.setPosition(Capturedfigure->x*100, Capturedfigure->y*100);
+                                Capturedfigure->SetPosition(extraFigures[i]->cell.x, extraFigures[i]->cell.y);
+                                Cell.sprite.setPosition(Capturedfigure->cell.x*100, Capturedfigure->cell.y*100);
                             }
                             else Capturedfigure = NULL;
                         }
@@ -243,12 +240,12 @@ int main()
                                     wasFigureGiven = 0;
                                     isFigureCaptured = 0;
                                     Cell.sprite.setPosition(-100, -100);
-                                    Capturedfigure->SetPosition(Capturedfigure->x, Capturedfigure->y);
+                                    Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
                                     Capturedfigure = NULL; 
                             }
                             else
                       //Переместить и зачистить если отпущена кнопка на поле отличном от начального
-                            if (!(x == Capturedfigure->x && y == Capturedfigure->y))
+                            if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y))
                             {
                                 wasFigureGiven = 0;
                                 isFigureCaptured = 0;

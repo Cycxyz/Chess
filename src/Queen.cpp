@@ -1,8 +1,8 @@
 #include "Queen.h"
 void Queen::SetSprite(bool isWhite)
 {
-	x = 0;
-	y = 0;
+	cell.x = 0;
+	cell.y = 0;
 	sf::Vector2i pos;
 	pos.x = 150;
 	if (isWhite)
@@ -19,10 +19,4 @@ void Queen::SetSprite(bool isWhite)
 	sprite.setTexture(texture);
 	float scale = 2 / 3.0;
 	sprite.setScale(scale, scale);
-}
-void Queen::SetPosition(int x_, int y_)
-{
-	x = x_;
-	y = y_;
-	sprite.setPosition(x * 100, y * 100);
 }
