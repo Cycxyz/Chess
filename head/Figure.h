@@ -29,19 +29,26 @@ public:
 	Figure(FigureType type_)
 	{
 		type = type_;
-		cell. x = 0;
-		cell.y = 0;
+		cell. x = -1;
+		cell.y = -1;
 		MadeMove = 0;
+		CastlingL = Cells{ -1,-1 };
+		CastlingR = Cells{ -1,-1 };
+		direction = 0;
 	}
 	std::set<Cells> allowed;
 	Cells cell;
 	bool MadeMove=0;
 	bool isWhite;
+	int direction;
+	Cells CastlingR;
+	Cells CastlingL;
 	sf::Image image;
 	sf::Texture texture;
 	sf::Sprite sprite;
 	FigureType type;
 	virtual void CalculateAllowed(std::vector<std::shared_ptr<Figure>>& figures);
+	virtual void CalculateAllowedForbidden(std::vector<std::shared_ptr<Figure>>& figures);
 	 virtual void SetSprite(bool isWhite) = 0;
 	  void SetPosition(int x_, int y_);
 private:

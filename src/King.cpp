@@ -36,15 +36,15 @@ void F(int x, int y, Figure* king, Figures figures, bool arg1, bool arg2)
 }
 void King::CalculateAllowed(Figures  figures)
 {
-	int x = cell.x-1, y = cell.y;
-	F(x, y, this, figures, x > -1, y>-1);
+	int x = cell.x - 1, y = cell.y;
+	F(x, y, this, figures, x > -1, y > -1);
 	x = cell.x + 1;
 	F(x, y, this, figures, x < 8, y>-1);
 	x = cell.x;
-	y = cell.y-1;
+	y = cell.y - 1;
 	F(x, y, this, figures, x < 8, y>-1);
 	y = cell.y + 1;
-	F(x, y, this, figures, x < 8, y<8);
+	F(x, y, this, figures, x < 8, y < 8);
 	x = cell.x + 1;
 	y = cell.y + 1;
 	F(x, y, this, figures, x < 8, y < 8);
@@ -54,4 +54,33 @@ void King::CalculateAllowed(Figures  figures)
 	F(x, y, this, figures, x > -1, y > -1);
 	x = cell.x + 1;
 	F(x, y, this, figures, x<8, y>-1);
+	x = cell.x + 2; y = cell.y;
+	int i = FindFigure(cell.x + 3, cell.y, figures);
+	if (!MadeMove &&
+		allowed.count(Cells{ cell.x + 1, cell.y }) == 1 &&
+		i != -1 &&
+		figures[i]->type == FigureType::Rook &&
+		figures[i]->isWhite == isWhite &&
+		!figures[i]->MadeMove &&
+		FindFigure(x, y, figures) == -1 &&
+		FindFigure(cell.x + 1, cell.y, figures) == -1)
+	{
+		allowed.insert(Cells{ x,y });
+		CastlingR = Cells{ x,y };
+	}
+	x = cell.x - 2; y = cell.y;
+	i = FindFigure(cell.x - 4, cell.y, figures);
+	if (!MadeMove &&
+		allowed.count(Cells{ cell.x -1, y }) == 1 &&
+		i != -1 &&
+		figures[i]->type == FigureType::Rook &&
+		figures[i]->isWhite == isWhite &&
+		!figures[i]->MadeMove &&
+		FindFigure(x, y, figures) == -1 &&
+		FindFigure(cell.x - 1, cell.y, figures) == -1 &&
+		FindFigure(cell.x - 3, cell.y, figures)==-1)
+	{
+		allowed.insert(Cells{ x,y });
+		CastlingL = Cells{ x,y };
+	}
 }

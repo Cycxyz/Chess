@@ -23,15 +23,12 @@
 		}
 		void Pawn::CalculateAllowed(Figures figures)
 		{
-			if (isWhite)
-			{
-				int k = -1;
-				int x = cell.x, y = cell.y+k;
+				int x = cell.x, y = cell.y+direction;
 				int i = FindFigure(x, y, figures);
 				if (i == -1)
 				{
 					allowed.insert(Cells{ x,y });
-					y+=k;
+					y+=direction;
 					if (!MadeMove)
 					{
 						 i = FindFigure(x, y, figures);
@@ -41,7 +38,7 @@
 						}
 					}
 				}
-				y = cell.y+k;
+				y = cell.y+direction;
 				x--;
 				i = FindFigure(x, y, figures);
 				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
@@ -50,5 +47,5 @@
 				i = FindFigure(x, y, figures);
 				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
 					allowed.insert(Cells{ x, y });
-			}
 		}
+		

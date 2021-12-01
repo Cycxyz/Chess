@@ -34,3 +34,57 @@ int FindFigure(int x, int y, Figures figures)
 	}
 	return -1;
 }
+void Figure::CalculateAllowedForbidden(Figures figures)
+{
+	if (type == FigureType::King) allowed.insert(Cells{ cell.x, cell.y });
+		Figure* king;
+		for (int i = 0; i < figures.size(); i++)
+			if (figures[i]->type == FigureType::King && figures[i]->isWhite == isWhite)
+				king = figures[i].get();
+		this->CalculateAllowed(figures);
+
+		//std::tuple<Cells, FigureType, bool> fig;
+			Cells remember = this->cell;
+		auto it = allowed.begin();
+		while (it != allowed.end())
+		{
+			bool flag = false;
+			this->SetPosition(it->x, it->y);
+			for (int i = 0; i < figures.size(); i++)
+			{
+				if (figures[i]->cell == cell) swap(figures[i], figures[figures.size() - 1]);
+			}
+			for (int i = 0; i < figures.size(); i++)
+			{
+				if (!(figures[i]->cell == cell))
+				{
+					auto type = figures[i]->type;
+					if (figures[i]->isWhite != isWhite/* && (type == FigureType::Bishop || type == FigureType::Queen || type == FigureType::Rook)*/)
+					{
+						figures[i]->CalculateAllowed(figures);
+						if (figures[i]->allowed.count(king->cell) == 1)
+						{
+							allowed.erase(it++);
+							flag = 1;
+						}
+						figures[i]->allowed.clear();
+						if (flag) break;
+					}
+				}
+			}
+			if (!flag) it++;
+		}
+		this->SetPosition(remember.x, remember.y);
+		if (FigureType::King == type)
+		{
+			if (!(allowed.count(Cells{ cell.x, cell.y }) &&
+				allowed.count(Cells{ cell.x + 1 , cell.y }) &&
+				allowed.count(Cells{ cell.x + 2, cell.y })))
+				allowed.erase(Cells{ cell.x + 2, cell.y });
+			if (!(allowed.count(Cells{ cell.x, cell.y }) &&
+				allowed.count(Cells{ cell.x - 1 , cell.y }) &&
+				allowed.count(Cells{ cell.x - 2, cell.y })))
+				allowed.erase(Cells{ cell.x - 2, cell.y });
+		}
+		if (allowed.count(Cells{ cell.x, cell.y }) == 1) allowed.erase(Cells{ cell.x, cell.y });
+	}
