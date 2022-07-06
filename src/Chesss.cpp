@@ -66,30 +66,31 @@ void InitFigures(Figures figures)
     }
 }
 
-void InitExtraFigures(Figures figures)
-{
-    for (int i = 0; i < 2; i++)
-    {
-        figures[0+i*6] = make_shared<King>();
-        figures[0+i*6]->SetSprite(i);
-        figures[0+i*6]->SetPosition(8+i, 0);
-        figures[1+i*6] = make_shared<Queen>();
-        figures[1+i*6]->SetSprite(i);
-        figures[1+i*6]->SetPosition(8+i, 1);
-        figures[2+i*6] = make_shared<Bishop>();
-        figures[2+i*6]->SetSprite(i);
-        figures[2+i*6]->SetPosition(8+i, 2);
-        figures[3+i*6] = make_shared<Horce>();
-        figures[3+i*6]->SetSprite(i);
-        figures[3+i*6]->SetPosition(8+i, 3);
-        figures[4+i*6] = make_shared<Rook>();
-        figures[4+i*6]->SetSprite(i);
-        figures[4+i*6]->SetPosition(8+i, 4);
-        figures[5+i*6] = make_shared<Pawn>();
-        figures[5+i*6]->SetSprite(i);
-        figures[5+i*6]->SetPosition(8+i, 5);
-    }
-}
+//void InitExtraFigures(Figures figures)
+//{
+// figures.resize(12);
+//    for (int i = 0; i < 2; i++)
+//    {
+//        figures[0+i*6] = make_shared<King>();
+//        figures[0+i*6]->SetSprite(i);
+//        figures[0+i*6]->SetPosition(8+i, 0);
+//        figures[1+i*6] = make_shared<Queen>();
+//        figures[1+i*6]->SetSprite(i);
+//        figures[1+i*6]->SetPosition(8+i, 1);
+//        figures[2+i*6] = make_shared<Bishop>();
+//        figures[2+i*6]->SetSprite(i);
+//        figures[2+i*6]->SetPosition(8+i, 2);
+//        figures[3+i*6] = make_shared<Horce>();
+//        figures[3+i*6]->SetSprite(i);
+//        figures[3+i*6]->SetPosition(8+i, 3);
+//        figures[4+i*6] = make_shared<Rook>();
+//        figures[4+i*6]->SetSprite(i);
+//        figures[4+i*6]->SetPosition(8+i, 4);
+//        figures[5+i*6] = make_shared<Pawn>();
+//        figures[5+i*6]->SetSprite(i);
+//        figures[5+i*6]->SetPosition(8+i, 5);
+//    }
+//}
 class Move
 {
 public:
@@ -112,7 +113,7 @@ void Draw(sf::RenderWindow& window, BoardConfigurator board, Figures figures, Ca
 window.clear(sf::Color::Blue);
     window.draw(board.sprite);
     window.draw(Cell.sprite);
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < extraFigures.size(); i++)
         window.draw(extraFigures[i]->sprite);
     for (int i = 0; i < figures.size(); i++)
         window.draw(figures[i]->sprite);
@@ -137,12 +138,16 @@ void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures fig
     else
     if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y)) //если фигура выделена и нажато на другом поле
     {
-        int index = FindFigure(x, y, figures);
-        if (index != -1) figures.erase(figures.begin() + index);
-        Cell.sprite.setPosition(-100, -100);
-        Capturedfigure->SetPosition(x, y);
-        Capturedfigure.get()->allowed.clear();
-        Capturedfigure = NULL;
+        if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
+        {
+            int index = FindFigure(x, y, figures);
+            if (index != -1) figures.erase(figures.begin() + index);
+            Capturedfigure->SetPosition(x, y);
+            Capturedfigure->MadeMove = 1;
+        }
+            Cell.sprite.setPosition(-100, -100);
+            Capturedfigure.get()->allowed.clear();
+            Capturedfigure = NULL;
     }
 }
 shared_ptr<Figure> ParseFigure(shared_ptr<Figure> figure)
@@ -166,14 +171,15 @@ shared_ptr<Figure> ParseFigure(shared_ptr<Figure> figure)
 
 int main()
 {
+    //cout << sizeof(Bishop);
     vector<Move> move;
     set<Cells> forbidden;
-    vector< shared_ptr<Figure> >extraFigures(12);
+    vector< shared_ptr<Figure> >extraFigures;
     CapturedFigureCell Cell;
     vector< shared_ptr<Figure>>figures;
     BoardConfigurator boardcfg;
-    //InitFigures(figures);
-    InitExtraFigures(extraFigures);
+    InitFigures(figures);
+    //InitExtraFigures(extraFigures);
     sf::RenderWindow window(sf::VideoMode(1000, 800), "May be chess");
     shared_ptr<Figure> Capturedfigure;
     bool isFigureCaptured = 0, wasFigureGiven=0, isWhiteTurn=1;
@@ -210,19 +216,19 @@ int main()
                         int y = event.mouseButton.y / 100;
                         int i = FindFigure(x, y, figures);
                             //Если на нажатом поле есть фигура, выделить её и показать ходы
-                        if(i!=-1)
+                        if (i != -1)
                         {
-                                Capturedfigure = figures[i];
-                                swap(figures[i], figures[figures.size() - 1]);
-                                Cell.sprite.setPosition(x * 100, y * 100);
-                                Capturedfigure.get()->CalculateAllowed(figures);
-                                for (Cells cell: Capturedfigure.get()->allowed)
-                                {
-                                    move.push_back(cell);
-                                }                               
+                            Capturedfigure = figures[i];
+                            swap(figures[i], figures[figures.size() - 1]);
+                            Cell.sprite.setPosition(x * 100, y * 100);
+                            Capturedfigure.get()->CalculateAllowed(figures);
+                            for (Cells cell : Capturedfigure.get()->allowed)
+                            {
+                                move.push_back(cell);
                             }
-                        else
-                        {
+                        }
+                        else Capturedfigure = NULL;
+                       /* {
                             i = FindFigure(x, y, extraFigures);
                             //Вдруг нажали на доп фигуры? Создать новую в том месте и выделить!
                             if (i != -1)
@@ -234,7 +240,7 @@ int main()
                                 Cell.sprite.setPosition(Capturedfigure->cell.x*100, Capturedfigure->cell.y*100);
                             }
                             else Capturedfigure = NULL;
-                        }
+                        }*/
                         if (Capturedfigure != NULL) //костыль
                         {
                             isFigureCaptured = 1;
@@ -255,7 +261,7 @@ int main()
                             int x = event.mouseButton.x / 100;
                             int y = event.mouseButton.y / 100;
                             //Если отпущена кнопка вне игрового поля
-                            if ((x < 0 || y < 0 || x>7 || y>7) && isFigureCaptured)
+                            if (((x < 0 || y < 0 || x>7 || y>7)) && isFigureCaptured)
                             {
                                     wasFigureGiven = 0;
                                     isFigureCaptured = 0;
@@ -266,18 +272,32 @@ int main()
                                     move.clear();
                             }
                             else
-                      //Переместить и зачистить если отпущена кнопка на поле отличном от начального
+                      //Переместить и зачистить если отпущена кнопка на поле отличном от начального 
                             if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y))
                             {
-                                wasFigureGiven = 0;
-                                isFigureCaptured = 0;
-                                Cell.sprite.setPosition(-100, -100);
-                                int index = FindFigure(x, y, figures);
-                                if (index != -1) figures.erase(figures.begin() + index);
-                                Capturedfigure->SetPosition(x, y);
-                                Capturedfigure->allowed.clear();
-                                Capturedfigure = NULL;
-                                move.clear();
+                                if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
+                                {
+                                    wasFigureGiven = 0;
+                                    isFigureCaptured = 0;
+                                    int index = FindFigure(x, y, figures);
+                                    if (index != -1) figures.erase(figures.begin() + index);
+                                    Capturedfigure->MadeMove = 1;
+                                    Capturedfigure->SetPosition(x, y);
+                                    Cell.sprite.setPosition(-100, -100);
+                                    Capturedfigure->allowed.clear();
+                                    Capturedfigure = NULL;
+                                    move.clear();
+                                }
+                                else
+                                {
+                                    wasFigureGiven = 0;
+                                    isFigureCaptured = 0;
+                                    Cell.sprite.setPosition(-100, -100);
+                                    Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                                    Capturedfigure->allowed.clear();
+                                    Capturedfigure = NULL;
+                                    move.clear();
+                                }
                             }
                             //Если до этого фигура была выделена, зачистить. Вернуть с гулянок
                             else if (wasFigureGiven)

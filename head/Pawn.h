@@ -4,7 +4,7 @@
 class Pawn:public Figure
 {
 public: 
-	//void CalculateAllowed(std::set<Cells> forbidden) override;
+	void CalculateAllowed(Figures figure) override;
     void SetSprite(bool isWhite) override;
 	Pawn() :Figure(FigureType::Pawn) {}
 };

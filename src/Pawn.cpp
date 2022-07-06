@@ -1,6 +1,7 @@
 #include "Pawn.h"
-		void Pawn::SetSprite(bool isWhite)
+		void Pawn::SetSprite(bool _isWhite)
 		{
+			isWhite = _isWhite;
 			cell.x = 0;
 			cell.y = 0;
 			sf::Vector2i pos;
@@ -19,4 +20,35 @@
 			sprite.setTexture(texture);
 			float scale = 2 / 3.0;
 			sprite.setScale(scale, scale);
+		}
+		void Pawn::CalculateAllowed(Figures figures)
+		{
+			if (isWhite)
+			{
+				int k = -1;
+				int x = cell.x, y = cell.y+k;
+				int i = FindFigure(x, y, figures);
+				if (i == -1)
+				{
+					allowed.insert(Cells{ x,y });
+					y+=k;
+					if (!MadeMove)
+					{
+						 i = FindFigure(x, y, figures);
+						if (i == -1)
+						{
+							allowed.insert(Cells{ x,y });
+						}
+					}
+				}
+				y = cell.y+k;
+				x--;
+				i = FindFigure(x, y, figures);
+				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
+					allowed.insert(Cells{x, y });
+				x += 2;
+				i = FindFigure(x, y, figures);
+				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
+					allowed.insert(Cells{ x, y });
+			}
 		}

@@ -31,9 +31,11 @@ public:
 		type = type_;
 		cell. x = 0;
 		cell.y = 0;
+		MadeMove = 0;
 	}
 	std::set<Cells> allowed;
 	Cells cell;
+	bool MadeMove=0;
 	bool isWhite;
 	sf::Image image;
 	sf::Texture texture;

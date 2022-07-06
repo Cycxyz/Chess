@@ -1,6 +1,8 @@
 #include "Horce.h"
-void Horce::SetSprite(bool isWhite)
+#include <functional>
+void Horce::SetSprite(bool _isWhite)
 {
+	isWhite = _isWhite;
 	cell.x = 0;
 	cell.y = 0;
 	sf::Vector2i pos;
@@ -19,4 +21,37 @@ void Horce::SetSprite(bool isWhite)
 	sprite.setTexture(texture);
 	float scale = 2 / 3.0;
 	sprite.setScale(scale, scale);
+}
+void F(Figures figures, Figure* figure, int x, int y, bool ar1, bool ar2)
+{
+	if (ar1 && ar2)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1) figure->allowed.insert(Cells{ x,y });
+		else
+			if (!(figures[i].get()->isWhite == figure->isWhite))
+			{
+				figure->allowed.insert(Cells{ x,y });
+			}
+	}
+};
+void Horce::CalculateAllowed(Figures figures)
+{
+	int x = cell.x, y = cell.y;
+	x += 2; y++;
+	F(figures, this, x, y, x < 8, y < 8);
+	x =cell.x+2; y=cell.y-1;
+	F(figures, this, x, y, x<8, y>-1);
+	x = cell.x - 2; y = cell.y + 1;
+	F(figures, this, x, y, x>-1, y<8);
+	x = cell.x - 2; y = cell.y - 1;
+	F(figures, this, x, y, x>-1, y>-1);
+	x =cell.x+1; y=cell.y+2;
+	F(figures, this, x, y, x < 8, y < 8);
+	x =cell.x+1; y=cell.y-2;
+	F(figures, this, x, y, x<8, y>-1);
+	x = cell.x - 1; y = cell.y + 2;
+	F(figures, this, x, y, x>-1, y<8);
+	x = cell.x - 1; y = cell.y - 2;
+	F(figures, this, x, y, x>-1, y>-1);
 }

@@ -1,6 +1,7 @@
 #include "Queen.h"
-void Queen::SetSprite(bool isWhite)
+void Queen::SetSprite(bool _isWhite)
 {
+	isWhite = _isWhite;
 	cell.x = 0;
 	cell.y = 0;
 	sf::Vector2i pos;
@@ -19,4 +20,119 @@ void Queen::SetSprite(bool isWhite)
 	sprite.setTexture(texture);
 	float scale = 2 / 3.0;
 	sprite.setScale(scale, scale);
+}
+void Queen::CalculateAllowed(Figures figures)
+{
+	int x = cell.x + 1, y = cell.y + 1;
+	while (x < 8 && y < 8)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1) allowed.insert(Cells{ x,y });
+		else
+			if (!(figures[i].get()->isWhite == isWhite))
+			{
+				allowed.insert(Cells{ x,y });
+				break;
+			}
+			else break;
+		x++; y++;
+	}
+	x = cell.x + 1; y = cell.y - 1;
+	while (x<8 && y>-1)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1)
+			allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		x++; y--;
+	}
+	x = cell.x - 1; y = cell.y - 1;
+	while (x > -1 && y > -1)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1) allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		x--; y--;
+	}
+	x = cell.x - 1; y = cell.y + 1;
+	while (x > -1 && y < 8)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1) allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		x--; y++;
+	}
+	x = cell.x + 1, y = cell.y;
+	while (x < 8)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1)
+			allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		x++;
+	}
+	x = cell.x - 1;
+	while (x > -1)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1)
+			allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		x--;
+	}
+	x = cell.x;
+	y = cell.y + 1;
+	while (y < 8)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1)
+			allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		y++;
+	}
+	y = cell.y - 1;
+	while (y > -1)
+	{
+		int i = FindFigure(x, y, figures);
+		if (i == -1)
+			allowed.insert(Cells{ x,y });
+		else if (!(figures[i].get()->isWhite == isWhite))
+		{
+			allowed.insert(Cells{ x,y });
+			break;
+		}
+		else break;
+		y--;
+	}
+	
 }
