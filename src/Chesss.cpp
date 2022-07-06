@@ -142,8 +142,7 @@ window.clear(sf::Color::Blue);
 }
 
 
-
-//Двигает фигуру на указанное место или поднимает, фигура выделена
+// Moves figure on selected place or raises, figure is highlited
 void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures figures, CapturedFigureCell& Cell)
 {
     int x = event.mouseButton.x / 100;
@@ -155,7 +154,7 @@ void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures fig
         Capturedfigure = NULL;
     }
     else
-    if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y)) //если фигура выделена и нажато на другом поле
+    if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y)) // if figure is highlighted and touched on another position
     {
         
         if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
@@ -241,7 +240,7 @@ int main()
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
                     
-                    if (Capturedfigure!=NULL) //если фигура уже выделена, то необходимо или сделать ход или поднять 
+                    if (Capturedfigure!=NULL) // if figure is highlighted we need to make a move of raise it
                     {
                         MoveFigure(event, Capturedfigure, figures, Cell);
                         if (Capturedfigure == NULL)
@@ -256,7 +255,7 @@ int main()
                         int x = event.mouseButton.x / 100;
                         int y = event.mouseButton.y / 100;
                         int i = FindFigure(x, y, figures);
-                            //Если на нажатом поле есть фигура, выделить её и показать ходы
+                            // If there is figure on selected postition - highlight it and show moves
                         if (i != -1)
                         {
                             Capturedfigure = figures[i];
@@ -271,7 +270,7 @@ int main()
                         else Capturedfigure = NULL;
                        /* {
                             i = FindFigure(x, y, extraFigures);
-                            //Вдруг нажали на доп фигуры? Создать новую в том месте и выделить!
+                            // If touched on extra figures - create new in that place and highlight
                             if (i != -1)
                             {
                                 figures.push_back(ParseFigure(extraFigures[i]));
@@ -301,7 +300,7 @@ int main()
                     { 
                             int x = event.mouseButton.x / 100;
                             int y = event.mouseButton.y / 100;
-                            //Если отпущена кнопка вне игрового поля
+                            // If figure released outside board
                             if (((x < 0 || y < 0 || x>7 || y>7)) && isFigureCaptured)
                             {
                                     wasFigureGiven = 0;
@@ -313,7 +312,7 @@ int main()
                                     move.clear();
                             }
                             else
-                      //Переместить и зачистить если отпущена кнопка на поле отличном от начального 
+                      // Move figure and remove highliting if it's released on field different from initial
                             if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y))
                             {
                                 if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
@@ -357,7 +356,7 @@ int main()
                                 move.clear();
 
                             }
-                            //Если до этого фигура была выделена, зачистить. Вернуть с гулянок
+                            // If figure was highlighted - remove highlighting, move to initial position
                             else if (wasFigureGiven)
                             {
                                 Cell.sprite.setPosition(-100, -100);
@@ -368,7 +367,7 @@ int main()
                                 Capturedfigure = NULL;
                                 move.clear();
                             }
-                            //Если не была, сказать, что её отпустили и указать, что уже была взята. Вернуть с гулянок
+                            // If didn't - mark that figure was released and that it was taken. Move to initial position
                             else
                             {
                                 Capturedfigure->SetPosition(x, y);

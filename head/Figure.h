@@ -16,7 +16,7 @@ enum class FigureType
     Pawn,
     Horce
 };
-//���������� ���� (0,0)
+
 struct Cells
 {
     int x, y;
