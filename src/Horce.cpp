@@ -3,8 +3,8 @@
 void Horce::SetSprite(bool _isWhite)
 {
 	isWhite = _isWhite;
-	cell.x = 0;
-	cell.y = 0;
+    currentPosition.x = 0;
+    currentPosition.y = 0;
 	sf::Vector2i pos;
 	pos.x = 450;
 	if (isWhite)
@@ -26,32 +26,32 @@ void F(Figures figures, Figure* figure, int x, int y, bool ar1, bool ar2)
 {
 	if (ar1 && ar2)
 	{
-		int i = FindFigure(x, y, figures);
-		if (i == -1) figure->allowed.insert(Cells{ x,y });
+        int i = findFigure(x, y, figures);
+		if (i == -1) figure->allowed.insert(Cell{ x,y });
 		else
 			if (!(figures[i].get()->isWhite == figure->isWhite))
 			{
-				figure->allowed.insert(Cells{ x,y });
+				figure->allowed.insert(Cell{ x,y });
 			}
 	}
 };
 void Horce::CalculateAllowed(Figures figures)
 {
-	int x = cell.x, y = cell.y;
+    int x = currentPosition.x, y = currentPosition.y;
 	x += 2; y++;
 	F(figures, this, x, y, x < 8, y < 8);
-	x =cell.x+2; y=cell.y-1;
+    x =currentPosition.x+2; y=currentPosition.y-1;
 	F(figures, this, x, y, x<8, y>-1);
-	x = cell.x - 2; y = cell.y + 1;
+    x = currentPosition.x - 2; y = currentPosition.y + 1;
 	F(figures, this, x, y, x>-1, y<8);
-	x = cell.x - 2; y = cell.y - 1;
+    x = currentPosition.x - 2; y = currentPosition.y - 1;
 	F(figures, this, x, y, x>-1, y>-1);
-	x =cell.x+1; y=cell.y+2;
+    x =currentPosition.x+1; y=currentPosition.y+2;
 	F(figures, this, x, y, x < 8, y < 8);
-	x =cell.x+1; y=cell.y-2;
+    x =currentPosition.x+1; y=currentPosition.y-2;
 	F(figures, this, x, y, x<8, y>-1);
-	x = cell.x - 1; y = cell.y + 2;
+    x = currentPosition.x - 1; y = currentPosition.y + 2;
 	F(figures, this, x, y, x>-1, y<8);
-	x = cell.x - 1; y = cell.y - 2;
+    x = currentPosition.x - 1; y = currentPosition.y - 2;
 	F(figures, this, x, y, x>-1, y>-1);
 }

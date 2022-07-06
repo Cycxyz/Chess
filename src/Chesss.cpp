@@ -36,34 +36,34 @@ void InitFigures(Figures figures)
     for (int i = 0; i < 8; i++)
     {
         figures[j*16+i] = make_shared<Pawn>();
-        figures[j*16+i]->SetSprite(j);
+        figures[j*16+i]->setSprite(j);
         figures[j * 16 + i]->direction = (j) ? -1 : 1;
-        figures[j * 16+i]->SetPosition(i, 1+j*5);
+        figures[j * 16+i]->setPosition(i, 1+j*5);
     }
         figures[j * 16 + 11] = make_shared<Rook>();
-        figures[j * 16 + 11]->SetSprite(j);
-        figures[j * 16 + 11]->SetPosition(0, j*7);
+        figures[j * 16 + 11]->setSprite(j);
+        figures[j * 16 + 11]->setPosition(0, j*7);
         figures[j * 16 + 10] = make_shared<Rook>();
-        figures[j * 16 + 10]->SetSprite(j);
-        figures[j * 16 + 10]->SetPosition(7, j*7);
+        figures[j * 16 + 10]->setSprite(j);
+        figures[j * 16 + 10]->setPosition(7, j*7);
         figures[j * 16 + 8] = make_shared<Horce>();
-        figures[j * 16 + 8]->SetSprite(j);
-        figures[j * 16 + 8]->SetPosition(1, j*7);
+        figures[j * 16 + 8]->setSprite(j);
+        figures[j * 16 + 8]->setPosition(1, j*7);
         figures[j * 16 + 9] = make_shared<Horce>();
-        figures[j * 16 + 9]->SetSprite(j);
-        figures[j * 16 + 9]->SetPosition(6, j*7);
+        figures[j * 16 + 9]->setSprite(j);
+        figures[j * 16 + 9]->setPosition(6, j*7);
         figures[j * 16 + 12] = make_shared<Bishop>();
-        figures[j * 16+12]->SetSprite(j);
-        figures[j * 16+12]->SetPosition(2, j*7);
+        figures[j * 16+12]->setSprite(j);
+        figures[j * 16+12]->setPosition(2, j*7);
         figures[j * 16+13] = make_shared<Bishop>();
-        figures[j * 16+13]->SetSprite(j);
-        figures[j * 16+13]->SetPosition(5, j*7);
+        figures[j * 16+13]->setSprite(j);
+        figures[j * 16+13]->setPosition(5, j*7);
         figures[j * 16+14] = make_shared<Queen>();
-        figures[j * 16+14]->SetSprite(j);
-        figures[j * 16+14]->SetPosition(3, j*7);
+        figures[j * 16+14]->setSprite(j);
+        figures[j * 16+14]->setPosition(3, j*7);
         figures[j * 16+15] = make_shared<King>();
-        figures[j * 16+15]->SetSprite(j);
-        figures[j * 16+15]->SetPosition(4, j*7);
+        figures[j * 16+15]->setSprite(j);
+        figures[j * 16+15]->setPosition(4, j*7);
     }
 }
 
@@ -116,7 +116,7 @@ public:
     sf::Image image;
     sf::Texture texture;
     sf::Sprite sprite;
-    Move(Cells cell)
+    Move(Cell cell)
     {
         image.loadFromFile("../images/move.png");
         auto pixel = image.getPixel(0, 0);
@@ -143,51 +143,51 @@ window.clear(sf::Color::Blue);
 
 
 // Moves figure on selected place or raises, figure is highlited
-void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures figures, CapturedFigureCell& Cell)
+void MoveFigure(sf::Event event, shared_ptr<Figure>& Capturedfigure, Figures figures, CapturedFigureCell& cell)
 {
     int x = event.mouseButton.x / 100;
     int y = event.mouseButton.y / 100;
     if ((x < 0 || y < 0 || x>7 || y>7))
     {
-        Cell.sprite.setPosition(-100, -100);
-        Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+        cell.sprite.setPosition(-100, -100);
+        Capturedfigure->setPosition(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y);
         Capturedfigure = NULL;
     }
     else
-    if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y)) // if figure is highlighted and touched on another position
+    if (!(x == Capturedfigure->currentPosition.x && y == Capturedfigure->currentPosition.y)) // if figure is highlighted and touched on another position
     {
         
-        if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
+        if (Capturedfigure->allowed.count(Cell{ x,y }) == 1)
         {
-            if (Cells{ x,y } == Capturedfigure->CastlingR)
+            if (Cell{ x,y } == Capturedfigure->castlingR)
             {
-                figures[FindFigure(7, Capturedfigure->cell.y, figures)]->SetPosition(5, Capturedfigure->cell.y);
+                figures[findFigure(7, Capturedfigure->currentPosition.y, figures)]->setPosition(5, Capturedfigure->currentPosition.y);
             }
-            else if (Cells{ x,y } == Capturedfigure->CastlingL)
+            else if (Cell{ x,y } == Capturedfigure->castlingL)
             {
-                figures[FindFigure(0, Capturedfigure->cell.y, figures)]->SetPosition(3, Capturedfigure->cell.y);
+                figures[findFigure(0, Capturedfigure->currentPosition.y, figures)]->setPosition(3, Capturedfigure->currentPosition.y);
             }
             else if (Capturedfigure->type == FigureType::Pawn &&
                 (Capturedfigure->direction == 1 && y == 7 ||
                     Capturedfigure->direction == -1 && y == 0))
             {
-                 int i= FindFigure(Capturedfigure->cell.x, Capturedfigure->cell.y, figures);
+                 int i= findFigure(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y, figures);
                 figures[i]= make_shared<Queen>();
-                figures[i]->SetSprite(Capturedfigure->isWhite);
-                figures[i]->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                figures[i]->setSprite(Capturedfigure->isWhite);
+                figures[i]->setPosition(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y);
                 Capturedfigure = figures[i];
             }
             else
             {
-                int index = FindFigure(x, y, figures);
+                int index = findFigure(x, y, figures);
                 if (index != -1) figures.erase(figures.begin() + index);
             }
-                Capturedfigure->SetPosition(x, y);
-                Capturedfigure->MadeMove = 1;
+                Capturedfigure->setPosition(x, y);
+                Capturedfigure->madeMove = 1;
         }
-            Cell.sprite.setPosition(-100, -100);
+            cell.sprite.setPosition(-100, -100);
             Capturedfigure.get()->allowed.clear();
-            Capturedfigure = NULL;
+            Capturedfigure = nullptr;
     }
 }
 shared_ptr<Figure> ParseFigure(shared_ptr<Figure> figure)
@@ -213,7 +213,7 @@ int main()
 {
     //cout << sizeof(Bishop);
     vector<Move> move;
-    set<Cells> forbidden;
+    set<Cell> forbidden;
     vector< shared_ptr<Figure> >extraFigures;
     CapturedFigureCell Cell;
     vector< shared_ptr<Figure>>figures;
@@ -254,15 +254,15 @@ int main()
                     {
                         int x = event.mouseButton.x / 100;
                         int y = event.mouseButton.y / 100;
-                        int i = FindFigure(x, y, figures);
+                        int i = findFigure(x, y, figures);
                             // If there is figure on selected postition - highlight it and show moves
                         if (i != -1)
                         {
                             Capturedfigure = figures[i];
                             swap(figures[i], figures[figures.size() - 1]);
                             Cell.sprite.setPosition(x * 100, y * 100);
-                            Capturedfigure.get()->CalculateAllowedForbidden(figures);
-                            for (Cells cell : Capturedfigure.get()->allowed)
+                            Capturedfigure.get()->calculateAllowedForbidden(figures);
+                            for (Cell cell : Capturedfigure.get()->allowed)
                             {
                                 move.push_back(cell);
                             }
@@ -306,48 +306,48 @@ int main()
                                     wasFigureGiven = 0;
                                     isFigureCaptured = 0;
                                     Cell.sprite.setPosition(-100, -100);
-                                    Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                                    Capturedfigure->setPosition(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y);
                                     Capturedfigure->allowed.clear(); 
                                     Capturedfigure = NULL; 
                                     move.clear();
                             }
                             else
                       // Move figure and remove highliting if it's released on field different from initial
-                            if (!(x == Capturedfigure->cell.x && y == Capturedfigure->cell.y))
+                            if (!(x == Capturedfigure->currentPosition.x && y == Capturedfigure->currentPosition.y))
                             {
-                                if (Capturedfigure->allowed.count(Cells{ x,y }) == 1)
+                                if (Capturedfigure->allowed.count(Cell{ x,y }) == 1)
                                 {
-                                    if (Cells{ x,y } == Capturedfigure->CastlingL)
+                                    if (Cell{ x,y } == Capturedfigure->CastlingL)
                                     {
-                                        figures[FindFigure(0, Capturedfigure->cell.y, figures)]->SetPosition(3, Capturedfigure->cell.y);
+                                        figures[findFigure(0, Capturedfigure->currentPosition.y, figures)]->setPosition(3, Capturedfigure->currentPosition.y);
                                     }
-                                    else if (Cells{ x,y } == Capturedfigure->CastlingR)
+                                    else if (Cell{ x,y } == Capturedfigure->CastlingR)
                                     {
-                                    figures[FindFigure(7, Capturedfigure->cell.y, figures)]->SetPosition(5, Capturedfigure->cell.y);
+                                    figures[findFigure(7, Capturedfigure->currentPosition.y, figures)]->setPosition(5, Capturedfigure->currentPosition.y);
                                     }
                                     else if (Capturedfigure->type == FigureType::Pawn &&
                                         (Capturedfigure->direction == 1 && y == 7 ||
                                             Capturedfigure->direction == -1 && y == 0))
                                     {
-                                        int i = FindFigure(Capturedfigure->cell.x, Capturedfigure->cell.y, figures);
+                                        int i = findFigure(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y, figures);
                                         figures[i] = make_shared<Queen>();
-                                        figures[i]->SetSprite(Capturedfigure->isWhite);
-                                        figures[i]->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                                        figures[i]->setSprite(Capturedfigure->isWhite);
+                                        figures[i]->setPosition(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y);
                                         Capturedfigure = figures[i];
                                     }
                                     else
                                     {
-                                        int index = FindFigure(x, y, figures);
+                                        int index = findFigure(x, y, figures);
                                         if (index != -1) figures.erase(figures.begin() + index);
                                     }
-                                    Capturedfigure->SetPosition(x, y);
-                                    Capturedfigure->MadeMove = 1;
+                                    Capturedfigure->setPosition(x, y);
+                                    Capturedfigure->madeMove = 1;
                                     Cell.sprite.setPosition(-100, -100);
                                 }
                                 else
                                 {
                                     Cell.sprite.setPosition(-100, -100);
-                                    Capturedfigure->SetPosition(Capturedfigure->cell.x, Capturedfigure->cell.y);
+                                    Capturedfigure->setPosition(Capturedfigure->currentPosition.x, Capturedfigure->currentPosition.y);
                                 }
                                 Capturedfigure->allowed.clear();
                                 Capturedfigure = NULL;
@@ -362,7 +362,7 @@ int main()
                                 Cell.sprite.setPosition(-100, -100);
                                 wasFigureGiven = 0;
                                 isFigureCaptured = 0;
-                                Capturedfigure->SetPosition(x, y);
+                                Capturedfigure->setPosition(x, y);
                                 Capturedfigure->allowed.clear();
                                 Capturedfigure = NULL;
                                 move.clear();
@@ -370,7 +370,7 @@ int main()
                             // If didn't - mark that figure was released and that it was taken. Move to initial position
                             else
                             {
-                                Capturedfigure->SetPosition(x, y);
+                                Capturedfigure->setPosition(x, y);
                                 wasFigureGiven = 1;
                                 isFigureCaptured = 0;
                             }

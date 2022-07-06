@@ -2,8 +2,8 @@
 		void Pawn::SetSprite(bool _isWhite)
 		{
 			isWhite = _isWhite;
-			cell.x = 0;
-			cell.y = 0;
+            currentPosition.x = 0;
+            currentPosition.y = 0;
 			sf::Vector2i pos;
 				pos.x = 750;
 				if (isWhite)
@@ -23,29 +23,29 @@
 		}
 		void Pawn::CalculateAllowed(Figures figures)
 		{
-				int x = cell.x, y = cell.y+direction;
-				int i = FindFigure(x, y, figures);
+                int x = currentPosition.x, y = currentPosition.y+direction;
+                int i = findFigure(x, y, figures);
 				if (i == -1)
 				{
-					allowed.insert(Cells{ x,y });
+					allowed.insert(Cell{ x,y });
 					y+=direction;
-					if (!MadeMove)
+					if (!madeMove)
 					{
-						 i = FindFigure(x, y, figures);
+                         i = findFigure(x, y, figures);
 						if (i == -1)
 						{
-							allowed.insert(Cells{ x,y });
+							allowed.insert(Cell{ x,y });
 						}
 					}
 				}
-				y = cell.y+direction;
+                y = currentPosition.y+direction;
 				x--;
-				i = FindFigure(x, y, figures);
+                i = findFigure(x, y, figures);
 				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
-					allowed.insert(Cells{x, y });
+					allowed.insert(Cell{x, y });
 				x += 2;
-				i = FindFigure(x, y, figures);
+                i = findFigure(x, y, figures);
 				if (i != -1 && !(figures[i].get()->isWhite == isWhite))
-					allowed.insert(Cells{ x, y });
+					allowed.insert(Cell{ x, y });
 		}
 		

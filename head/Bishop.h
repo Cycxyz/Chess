@@ -3,8 +3,13 @@
 #include "Figure.h"
 class Bishop :public Figure
 {
-public:
-	void CalculateAllowed(Figures figures) override;
-	void SetSprite(bool isWhite) override;
-	Bishop() :Figure(FigureType::Bishop) {}
+  public:
+    void calculateAllowed(Figures &figures) override;
+    void setSprite(bool isWhite) override;
+    Bishop() : Figure(FigureType::Bishop)
+    {
+    }
+
+  private:
+    void calculateInDirection();
 };

@@ -4,7 +4,7 @@
 class Rook :public Figure
 {
 public:
-	void CalculateAllowed(Figures figures) override;
-	void SetSprite(bool isWhite) override;
+	void calculateAllowed(Figures figures) override;
+	void setSprite(bool isWhite) override;
 	Rook() :Figure(FigureType::Rook){}
 };

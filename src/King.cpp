@@ -2,8 +2,8 @@
 void King::SetSprite(bool _isWhite)
 {
 	isWhite = _isWhite;
-	cell.x = 0;
-	cell.y = 0;
+    currentPosition.x = 0;
+    currentPosition.y = 0;
 	sf::Vector2i pos;
 	pos.x = 0;
 	if (isWhite)
@@ -25,62 +25,62 @@ void F(int x, int y, Figure* king, Figures figures, bool arg1, bool arg2)
 {
 	if (arg1 && arg2)
 	{
-		int i = FindFigure(x, y, figures);
+        int i = findFigure(x, y, figures);
 		if (i == -1)
 		{
-			king->allowed.insert(Cells{ x,y });
+			king->allowed.insert(Cell{ x,y });
 		}
 		else if (figures[i].get()->isWhite != king->isWhite)
-			king->allowed.insert(Cells{x, y});
+			king->allowed.insert(Cell{x, y});
 	}
 }
 void King::CalculateAllowed(Figures  figures)
 {
-	int x = cell.x - 1, y = cell.y;
+    int x = currentPosition.x - 1, y = currentPosition.y;
 	F(x, y, this, figures, x > -1, y > -1);
-	x = cell.x + 1;
+    x = currentPosition.x + 1;
 	F(x, y, this, figures, x < 8, y>-1);
-	x = cell.x;
-	y = cell.y - 1;
+    x = currentPosition.x;
+    y = currentPosition.y - 1;
 	F(x, y, this, figures, x < 8, y>-1);
-	y = cell.y + 1;
+    y = currentPosition.y + 1;
 	F(x, y, this, figures, x < 8, y < 8);
-	x = cell.x + 1;
-	y = cell.y + 1;
+    x = currentPosition.x + 1;
+    y = currentPosition.y + 1;
 	F(x, y, this, figures, x < 8, y < 8);
-	x = cell.x - 1;
+    x = currentPosition.x - 1;
 	F(x, y, this, figures, x > -1, y < 8);
-	y = cell.y - 1;
+    y = currentPosition.y - 1;
 	F(x, y, this, figures, x > -1, y > -1);
-	x = cell.x + 1;
+    x = currentPosition.x + 1;
 	F(x, y, this, figures, x<8, y>-1);
-	x = cell.x + 2; y = cell.y;
-	int i = FindFigure(cell.x + 3, cell.y, figures);
-	if (!MadeMove &&
-		allowed.count(Cells{ cell.x + 1, cell.y }) == 1 &&
+    x = currentPosition.x + 2; y = currentPosition.y;
+    int i = findFigure(currentPosition.x + 3, currentPosition.y, figures);
+	if (!madeMove &&
+        allowed.count(Cell{ currentPosition.x + 1, currentPosition.y }) == 1 &&
 		i != -1 &&
 		figures[i]->type == FigureType::Rook &&
 		figures[i]->isWhite == isWhite &&
-		!figures[i]->MadeMove &&
-		FindFigure(x, y, figures) == -1 &&
-		FindFigure(cell.x + 1, cell.y, figures) == -1)
+		!figures[i]->madeMove &&
+        findFigure(x, y, figures) == -1 &&
+        findFigure(currentPosition.x + 1, currentPosition.y, figures) == -1)
 	{
-		allowed.insert(Cells{ x,y });
-		CastlingR = Cells{ x,y };
+		allowed.insert(Cell{ x,y });
+		castlingR = Cell{ x,y };
 	}
-	x = cell.x - 2; y = cell.y;
-	i = FindFigure(cell.x - 4, cell.y, figures);
-	if (!MadeMove &&
-		allowed.count(Cells{ cell.x -1, y }) == 1 &&
+    x = currentPosition.x - 2; y = currentPosition.y;
+    i = findFigure(currentPosition.x - 4, currentPosition.y, figures);
+	if (!madeMove &&
+        allowed.count(Cell{ currentPosition.x -1, y }) == 1 &&
 		i != -1 &&
 		figures[i]->type == FigureType::Rook &&
 		figures[i]->isWhite == isWhite &&
-		!figures[i]->MadeMove &&
-		FindFigure(x, y, figures) == -1 &&
-		FindFigure(cell.x - 1, cell.y, figures) == -1 &&
-		FindFigure(cell.x - 3, cell.y, figures)==-1)
+		!figures[i]->madeMove &&
+        findFigure(x, y, figures) == -1 &&
+        findFigure(currentPosition.x - 1, currentPosition.y, figures) == -1 &&
+        findFigure(currentPosition.x - 3, currentPosition.y, figures)==-1)
 	{
-		allowed.insert(Cells{ x,y });
-		CastlingL = Cells{ x,y };
+		allowed.insert(Cell{ x,y });
+		castlingL = Cell{ x,y };
 	}
 }

@@ -4,7 +4,7 @@
 class Horce : public Figure
 {
 public:
-	void CalculateAllowed(Figures figures) override;
-	void  SetSprite(bool isWhite) override;
+	void calculateAllowed(Figures figures) override;
+	void  setSprite(bool isWhite) override;
 	Horce():Figure(FigureType::Horce){}
 };
